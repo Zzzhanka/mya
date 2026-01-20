@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Global Game Jam - Регистрация</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 100%);
+            color: #fff;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 20px 0;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            background: linear-gradient(120deg, #ff6b35 0%, #ff8c42 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 700;
+            letter-spacing: -1px;
+        }
+
+        .header p {
+            color: #a0a0a0;
+            font-size: 1.1em;
+        }
+
+        .form-section {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 107, 53, 0.3);
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 30px;
+            backdrop-filter: blur(10px);
+        }
+
+        .form-section h2 {
+            font-size: 1.5em;
+            margin-bottom: 10px;
+            color: #ff6b35;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .form-section h2::before {
+            content: '';
+            display: inline-block;
+            width: 4px;
+            height: 24px;
+            background: #ff6b35;
+            border-radius: 2px;
+        }
+
+        .form-section p {
+            color: #a0a0a0;
+            margin-bottom: 20px;
+            font-size: 0.95em;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #e0e0e0;
+            font-size: 0.95em;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid rgba(255, 107, 53, 0.2);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            color: #fff;
+            font-size: 1em;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #ff6b35;
+            background: rgba(255, 107, 53, 0.1);
+            box-shadow: 0 0 0 3px rgba(255, 107, 53, 0.1);
+        }
+
+        .computers-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .computer-slot {
+            aspect-ratio: 1;
+            border: 2px solid rgba(255, 107, 53, 0.3);
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.03);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .computer-slot::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .computer-slot:hover::before {
+            left: 100%;
+        }
+
+        .computer-slot.available {
+            border-color: rgba(76, 175, 80, 0.5);
+            background: rgba(76, 175, 80, 0.05);
+        }
+
+        .computer-slot.available:hover {
+            border-color: #4caf50;
+            background: rgba(76, 175, 80, 0.15);
+            transform: translateY(-4px);
+            box-shadow: 0 8px 16px rgba(76, 175, 80, 0.2);
+        }
+
+        .computer-slot.selected {
+            border-color: #ff6b35;
+            background: rgba(255, 107, 53, 0.2);
+            box-shadow: 0 0 0 3px rgba(255, 107, 53, 0.2);
+            transform: scale(1.05);
+        }
+
+        .computer-slot.booked {
+            border-color: rgba(244, 67, 54, 0.5);
+            background: rgba(244, 67, 54, 0.1);
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        .computer-slot.booked:hover {
+            transform: none;
+            box-shadow: none;
+        }
+
+        .computer-number {
+            font-size: 1.2em;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .computer-status {
+            font-size: 0.7em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 500;
+        }
+
+        .computer-slot.available .computer-status {
+            color: #4caf50;
+        }
+
+        .computer-slot.booked .computer-status {
+            color: #f44336;
+        }
+
+        .computer-slot.selected .computer-status {
+            color: #ff6b35;
+        }
+
+        .selection-info {
+            padding: 15px;
+            background: rgba(255, 107, 53, 0.1);
+            border-left: 4px solid #ff6b35;
+            border-radius: 6px;
+            margin-top: 15px;
+            display: none;
+        }
+
+        .selection-info.active {
+            display: block;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .selection-info p {
+            color: #ff6b35;
+            margin: 0;
+            font-weight: 500;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 107, 53, 0.2);
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 1.8em;
+            font-weight: 700;
+            background: linear-gradient(120deg, #ff6b35 0%, #ff8c42 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .stat-label {
+            font-size: 0.85em;
+            color: #a0a0a0;
+            margin-top: 5px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 14px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-submit {
+            background: linear-gradient(120deg, #ff6b35 0%, #ff8c42 100%);
+            color: #fff;
+        }
+
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 24px rgba(255, 107, 53, 0.3);
+        }
+
+        .btn-submit:active {
+            transform: translateY(0);
+        }
+
+        .btn-submit:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-reset {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-reset:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .legend {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 25px;
+            padding-top: 25px;
+            border-top: 1px solid rgba(255, 107, 53, 0.2);
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.9em;
+        }
+
+        .legend-color {
+            width: 24px;
+            height: 24px;
+            border: 2px solid;
+            border-radius: 6px;
+        }
+
+        .legend-color.available {
+            border-color: #4caf50;
+            background: rgba(76, 175, 80, 0.2);
+        }
+
+        .legend-color.booked {
+            border-color: #f44336;
+            background: rgba(244, 67, 54, 0.2);
+        }
+
+        .legend-color.selected {
+            border-color: #ff6b35;
+            background: rgba(255, 107, 53, 0.2);
+        }
+
+        .success-message {
+            display: none;
+            padding: 20px;
+            background: rgba(76, 175, 80, 0.15);
+            border: 1px solid #4caf50;
+            border-radius: 8px;
+            color: #4caf50;
+            margin-top: 20px;
+            animation: slideIn 0.3s ease;
+        }
+
+        .success-message.active {
+            display: block;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.8em;
+            }
+
+            .computers-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+
+            .form-section {
+                padding: 20px;
+            }
+
+            .stats {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>GLOBAL GAME JAM</h1>
+            <p>Регистрация участников и бронирование компьютеров</p>
+        </div>
+
+        <form id="registrationForm">
+            <!-- Персональные данные -->
+            <div class="form-section">
+                <h2>Персональные данные</h2>
+                <p>Заполните основную информацию об участнике</p>
+                
+                <div class="form-group">
+                    <label for="name">Имя и фамилия *</label>
+                    <input type="text" id="name" name="name" placeholder="Введите ваше имя" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="email">Email *</label>
+                    <input type="email" id="email" name="email" placeholder="your@email.com" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="phone">Телефон</label>
+                    <input type="tel" id="phone" name="phone" placeholder="+7 (999) 999-99-99">
+                </div>
+            </div>
+
+            <!-- Выбор компьютера -->
+            <div class="form-section">
+                <h2>Бронирование рабочего места</h2>
+                <p>Выберите компьютер из доступных. Нажмите на слот для выбора.</p>
+                
+                <div class="computers-grid" id="computersGrid"></div>
+
+                <div class="selection-info" id="selectionInfo">
+                    <p>✓ Выбранное место: <span id="selectedComputer"></span></p>
+                </div>
+
+                <div class="stats">
+                    <div class="stat">
+                        <div class="stat-number" id="availableCount">12</div>
+                        <div class="stat-label">Доступно</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-number" id="bookedCount">0</div>
+                        <div class="stat-label">Забронировано</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-number" id="selectedCount">0</div>
+                        <div class="stat-label">Выбрано вами</div>
+                    </div>
+                </div>
+
+                <div class="legend">
+                    <div class="legend-item">
+                        <div class="legend-color available"></div>
+                        <span>Доступно</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color booked"></div>
+                        <span>Забронировано</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color selected"></div>
+                        <span>Ваш выбор</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Кнопки -->
+            <div class="button-group">
+                <button type="button" class="btn btn-reset" onclick="resetForm()">Сбросить</button>
+                <button type="submit" class="btn btn-submit" id="submitBtn">Зарегистрироваться</button>
+            </div>
+
+            <div class="success-message" id="successMessage">
+                ✓ Спасибо за регистрацию! Ваше место забронировано.
+            </div>
+        </form>
+    </div>
+
+    <script>
+        const TOTAL_COMPUTERS = 12;
+        let selectedComputer = null;
+        let bookedComputers = [2, 5, 8]; // Предзаполненные забронированные места
+
+        function initializeComputers() {
+            const grid = document.getElementById('computersGrid');
+            grid.innerHTML = '';
+
+            for (let i = 1; i <= TOTAL_COMPUTERS; i++) {
+                const slot = document.createElement('div');
+                slot.className = 'computer-slot available';
+                slot.id = `computer-${i}`;
+
+                if (bookedComputers.includes(i)) {
+                    slot.classList.remove('available');
+                    slot.classList.add('booked');
+                }
+
+                slot.innerHTML = `
+                    <div class="computer-number">#${i}</div>
+                    <div class="computer-status">${bookedComputers.includes(i) ? 'Занято' : 'Свободно'}</div>
+                `;
+
+                if (!bookedComputers.includes(i)) {
+                    slot.addEventListener('click', () => selectComputer(i, slot));
+                }
+
+                grid.appendChild(slot);
+            }
+
+            updateStats();
+        }
+
+        function selectComputer(number, element) {
+            if (selectedComputer !== null) {
+                const previousElement = document.getElementById(`computer-${selectedComputer}`);
+                previousElement.classList.remove('selected');
+            }
+
+            selectedComputer = number;
+            element.classList.add('selected');
+
+            document.getElementById('selectedComputer').textContent = `Компьютер #${number}`;
+            document.getElementById('selectionInfo').classList.add('active');
+            updateStats();
+        }
+
+        function updateStats() {
+            const available = TOTAL_COMPUTERS - bookedComputers.length;
+            const booked = bookedComputers.length;
+            const selected = selectedComputer !== null ? 1 : 0;
+
+            document.getElementById('availableCount').textContent = available;
+            document.getElementById('bookedCount').textContent = booked;
+            document.getElementById('selectedCount').textContent = selected;
+        }
+
+        function resetForm() {
+            document.getElementById('registrationForm').reset();
+            document.getElementById('selectionInfo').classList.remove('active');
+            if (selectedComputer !== null) {
+                document.getElementById(`computer-${selectedComputer}`).classList.remove('selected');
+            }
+            selectedComputer = null;
+            updateStats();
+            document.getElementById('successMessage').classList.remove('active');
+        }
+
+        document.getElementById('registrationForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+
+            const name = document.getElementById('name').value.trim();
+            const email = document.getElementById('email').value.trim();
+
+            if (!name || !email) {
+                alert('Пожалуйста, заполните все обязательные поля');
+                return;
+            }
+
+            if (selectedComputer === null) {
+                alert('Пожалуйста, выберите компьютер');
+                return;
+            }
+
+            // Имитация отправки формы
+            bookedComputers.push(selectedComputer);
+            const element = document.getElementById(`computer-${selectedComputer}`);
+            element.classList.remove('available', 'selected');
+            element.classList.add('booked');
+            element.onclick = null;
+
+            document.getElementById('successMessage').classList.add('active');
+            selectedComputer = null;
+            document.getElementById('selectionInfo').classList.remove('active');
+            updateStats();
+
+            // Очистка формы через 2 секунды
+            setTimeout(() => {
+                document.getElementById('registrationForm').reset();
+            }, 2000);
+        });
+
+        // Инициализация при загрузке
+        document.addEventListener('DOMContentLoaded', initializeComputers);
+    </script>
+</body>
+</html>
