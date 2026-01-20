@@ -471,7 +471,14 @@
     <script>
         const TOTAL_COMPUTERS = 12;
         let selectedComputer = null;
-        let bookedComputers = [2, 5, 8]; // Предзаполненные забронированные места
+        let bookedComputers = [];
+
+        async function loadBooked() {
+          const res = await fetch('ТВОЙ_WEB_APP_URL');
+          bookedComputers = await res.json();
+          initializeComputers();
+        }
+ // Предзаполненные забронированные места
 
         function initializeComputers() {
             const grid = document.getElementById('computersGrid');
@@ -513,6 +520,7 @@
 
             document.getElementById('selectedComputer').textContent = `Компьютер #${number}`;
             document.getElementById('selectionInfo').classList.add('active');
+            document.addEventListener('DOMContentLoaded', loadBooked);
             updateStats();
         }
 
@@ -554,16 +562,38 @@
             }
 
             // Имитация отправки формы
-            bookedComputers.push(selectedComputer);
-            const element = document.getElementById(`computer-${selectedComputer}`);
-            element.classList.remove('available', 'selected');
-            element.classList.add('booked');
-            element.onclick = null;
-
-            document.getElementById('successMessage').classList.add('active');
-            selectedComputer = null;
-            document.getElementById('selectionInfo').classList.remove('active');
-            updateStats();
+            document.getElementById('registrationForm').addEventListener('submit', async (e) => {
+              e.preventDefault();
+            
+              if (!selectedComputer) {
+                alert('Выберите компьютер');
+                return;
+              }
+            
+              const payload = {
+                name: name.value,
+                email: email.value,
+                phone: phone.value,
+                computer: selectedComputer
+              };
+            
+              const res = await fetch('ТВОЙ_WEB_APP_URL', {
+                method: 'POST',
+                body: JSON.stringify(payload)
+              });
+            
+              const result = await res.json();
+            
+              if (!result.success) {
+                alert('Это место уже заняли 😢');
+                loadBooked();
+                return;
+              }
+            
+              document.getElementById('successMessage').classList.add('active');
+              selectedComputer = null;
+              loadBooked();
+            });
 
             // Очистка формы через 2 секунды
             setTimeout(() => {
