@@ -474,7 +474,7 @@
         let bookedComputers = [];
 
         async function loadBooked() {
-          const res = await fetch('https://docs.google.com/spreadsheets/d/1NkhzHDQWWQvoKj1WfjQug7zVI8Tyq2DXgOpbE6miu4g/edit?usp=sharing');
+          const res = await fetch('https://script.google.com/macros/s/AKfycbxxXxScDpUGSWmlrDnkr8wA7xMEp9nmMcCres-KmP7bXa1yDCV6QkdGP9engwHM6y5A3Q/exec');
           bookedComputers = await res.json();
           initializeComputers();
         }
