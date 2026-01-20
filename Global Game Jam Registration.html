@@ -474,7 +474,7 @@
         let bookedComputers = [];
 
         async function loadBooked() {
-          const res = await fetch('ТВОЙ_WEB_APP_URL');
+          const res = await fetch('https://docs.google.com/spreadsheets/d/1NkhzHDQWWQvoKj1WfjQug7zVI8Tyq2DXgOpbE6miu4g/edit?usp=sharing');
           bookedComputers = await res.json();
           initializeComputers();
         }
